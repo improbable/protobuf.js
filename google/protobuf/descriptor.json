@@ -8,7 +8,7 @@
               "fields": {
                 "file": {
                   "rule": "repeated",
-                  "type": "FileDescriptorProto",
+                  "type": ".google.protobuf.FileDescriptorProto",
                   "id": 1
                 }
               }
@@ -46,30 +46,30 @@
                 },
                 "messageType": {
                   "rule": "repeated",
-                  "type": "DescriptorProto",
+                  "type": ".google.protobuf.DescriptorProto",
                   "id": 4
                 },
                 "enumType": {
                   "rule": "repeated",
-                  "type": "EnumDescriptorProto",
+                  "type": ".google.protobuf.EnumDescriptorProto",
                   "id": 5
                 },
                 "service": {
                   "rule": "repeated",
-                  "type": "ServiceDescriptorProto",
+                  "type": ".google.protobuf.ServiceDescriptorProto",
                   "id": 6
                 },
                 "extension": {
                   "rule": "repeated",
-                  "type": "FieldDescriptorProto",
+                  "type": ".google.protobuf.FieldDescriptorProto",
                   "id": 7
                 },
                 "options": {
-                  "type": "FileOptions",
+                  "type": ".google.protobuf.FileOptions",
                   "id": 8
                 },
                 "sourceCodeInfo": {
-                  "type": "SourceCodeInfo",
+                  "type": ".google.protobuf.SourceCodeInfo",
                   "id": 9
                 },
                 "syntax": {
@@ -86,41 +86,41 @@
                 },
                 "field": {
                   "rule": "repeated",
-                  "type": "FieldDescriptorProto",
+                  "type": ".google.protobuf.FieldDescriptorProto",
                   "id": 2
                 },
                 "extension": {
                   "rule": "repeated",
-                  "type": "FieldDescriptorProto",
+                  "type": ".google.protobuf.FieldDescriptorProto",
                   "id": 6
                 },
                 "nestedType": {
                   "rule": "repeated",
-                  "type": "DescriptorProto",
+                  "type": ".google.protobuf.DescriptorProto",
                   "id": 3
                 },
                 "enumType": {
                   "rule": "repeated",
-                  "type": "EnumDescriptorProto",
+                  "type": ".google.protobuf.EnumDescriptorProto",
                   "id": 4
                 },
                 "extensionRange": {
                   "rule": "repeated",
-                  "type": "ExtensionRange",
+                  "type": ".google.protobuf.DescriptorProto.ExtensionRange",
                   "id": 5
                 },
                 "oneofDecl": {
                   "rule": "repeated",
-                  "type": "OneofDescriptorProto",
+                  "type": ".google.protobuf.OneofDescriptorProto",
                   "id": 8
                 },
                 "options": {
-                  "type": "MessageOptions",
+                  "type": ".google.protobuf.MessageOptions",
                   "id": 7
                 },
                 "reservedRange": {
                   "rule": "repeated",
-                  "type": "ReservedRange",
+                  "type": ".google.protobuf.DescriptorProto.ReservedRange",
                   "id": 9
                 },
                 "reservedName": {
@@ -167,11 +167,11 @@
                   "id": 3
                 },
                 "label": {
-                  "type": "Label",
+                  "type": ".google.protobuf.FieldDescriptorProto.Label",
                   "id": 4
                 },
                 "type": {
-                  "type": "Type",
+                  "type": ".google.protobuf.FieldDescriptorProto.Type",
                   "id": 5
                 },
                 "typeName": {
@@ -195,7 +195,7 @@
                   "id": 10
                 },
                 "options": {
-                  "type": "FieldOptions",
+                  "type": ".google.protobuf.FieldOptions",
                   "id": 8
                 }
               },
@@ -238,7 +238,7 @@
                   "id": 1
                 },
                 "options": {
-                  "type": "OneofOptions",
+                  "type": ".google.protobuf.OneofOptions",
                   "id": 2
                 }
               }
@@ -251,11 +251,11 @@
                 },
                 "value": {
                   "rule": "repeated",
-                  "type": "EnumValueDescriptorProto",
+                  "type": ".google.protobuf.EnumValueDescriptorProto",
                   "id": 2
                 },
                 "options": {
-                  "type": "EnumOptions",
+                  "type": ".google.protobuf.EnumOptions",
                   "id": 3
                 }
               }
@@ -271,7 +271,7 @@
                   "id": 2
                 },
                 "options": {
-                  "type": "EnumValueOptions",
+                  "type": ".google.protobuf.EnumValueOptions",
                   "id": 3
                 }
               }
@@ -284,11 +284,11 @@
                 },
                 "method": {
                   "rule": "repeated",
-                  "type": "MethodDescriptorProto",
+                  "type": ".google.protobuf.MethodDescriptorProto",
                   "id": 2
                 },
                 "options": {
-                  "type": "ServiceOptions",
+                  "type": ".google.protobuf.ServiceOptions",
                   "id": 3
                 }
               }
@@ -308,7 +308,7 @@
                   "id": 3
                 },
                 "options": {
-                  "type": "MethodOptions",
+                  "type": ".google.protobuf.MethodOptions",
                   "id": 4
                 },
                 "clientStreaming": {
@@ -347,7 +347,7 @@
                   "id": 27
                 },
                 "optimizeFor": {
-                  "type": "OptimizeMode",
+                  "type": ".google.protobuf.FileOptions.OptimizeMode",
                   "id": 9,
                   "options": {
                     "default": "SPEED"
@@ -387,7 +387,7 @@
                 },
                 "uninterpretedOption": {
                   "rule": "repeated",
-                  "type": "UninterpretedOption",
+                  "type": ".google.protobuf.UninterpretedOption",
                   "id": 999
                 }
               },
@@ -433,7 +433,7 @@
                 },
                 "uninterpretedOption": {
                   "rule": "repeated",
-                  "type": "UninterpretedOption",
+                  "type": ".google.protobuf.UninterpretedOption",
                   "id": 999
                 }
               },
@@ -453,7 +453,7 @@
             "FieldOptions": {
               "fields": {
                 "ctype": {
-                  "type": "CType",
+                  "type": ".google.protobuf.FieldOptions.CType",
                   "id": 1,
                   "options": {
                     "default": "STRING"
@@ -464,7 +464,7 @@
                   "id": 2
                 },
                 "jstype": {
-                  "type": "JSType",
+                  "type": ".google.protobuf.FieldOptions.JSType",
                   "id": 6,
                   "options": {
                     "default": "JS_NORMAL"
@@ -484,7 +484,7 @@
                 },
                 "uninterpretedOption": {
                   "rule": "repeated",
-                  "type": "UninterpretedOption",
+                  "type": ".google.protobuf.UninterpretedOption",
                   "id": 999
                 }
               },
@@ -521,7 +521,7 @@
               "fields": {
                 "uninterpretedOption": {
                   "rule": "repeated",
-                  "type": "UninterpretedOption",
+                  "type": ".google.protobuf.UninterpretedOption",
                   "id": 999
                 }
               },
@@ -544,7 +544,7 @@
                 },
                 "uninterpretedOption": {
                   "rule": "repeated",
-                  "type": "UninterpretedOption",
+                  "type": ".google.protobuf.UninterpretedOption",
                   "id": 999
                 }
               },
@@ -563,7 +563,7 @@
                 },
                 "uninterpretedOption": {
                   "rule": "repeated",
-                  "type": "UninterpretedOption",
+                  "type": ".google.protobuf.UninterpretedOption",
                   "id": 999
                 }
               },
@@ -582,7 +582,7 @@
                 },
                 "uninterpretedOption": {
                   "rule": "repeated",
-                  "type": "UninterpretedOption",
+                  "type": ".google.protobuf.UninterpretedOption",
                   "id": 999
                 }
               },
@@ -601,7 +601,7 @@
                 },
                 "uninterpretedOption": {
                   "rule": "repeated",
-                  "type": "UninterpretedOption",
+                  "type": ".google.protobuf.UninterpretedOption",
                   "id": 999
                 }
               },
@@ -665,7 +665,7 @@
               "fields": {
                 "location": {
                   "rule": "repeated",
-                  "type": "Location",
+                  "type": ".google.protobuf.SourceCodeInfo.Location",
                   "id": 1
                 }
               },
@@ -703,7 +703,7 @@
               "fields": {
                 "annotation": {
                   "rule": "repeated",
-                  "type": "Annotation",
+                  "type": ".google.protobuf.GeneratedCodeInfo.Annotation",
                   "id": 1
                 }
               },
