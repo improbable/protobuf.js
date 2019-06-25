@@ -216,30 +216,12 @@ Namespace.prototype.getEnum = function getEnum(name) {
  * @throws {Error} If there is already a nested object with this name
  */
 Namespace.prototype.add = function add(object) {
-    // console.log('Namespace.prototype.add.start');
     if (!(object instanceof Field && object.extend !== undefined || object instanceof Type || object instanceof Enum || object instanceof Service || object instanceof Namespace))
         throw TypeError("object must be a valid nested object");
 
     if (!this.nested)
         this.nested = {};
-    else {
-        // var prev = this.get(object.name);
-        // if (prev) {
-        //     if (prev instanceof Namespace && object instanceof Namespace && !(prev instanceof Type || prev instanceof Service)) {
-        //         // replace plain namespace but keep existing nested elements and options
-        //         console.log('Namespace.prototype.add.prev');
-        //         var nested = prev.nestedArray;
-        //         for (var i = 0; i < nested.length; ++i)
-        //             object.add(nested[i]);
-        //         this.remove(prev);
-        //         if (!this.nested)
-        //             this.nested = {};
-        //         object.setOptions(prev.options, true);
-        //
-        //     } else
-        //         throw Error("duplicate name '" + object.name + "' in " + this);
-        // }
-    }
+
     this.nested[object.name] = object;
     object.onAdd(this);
     return clearCache(this);
