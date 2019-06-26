@@ -66,7 +66,7 @@ function Type(name, options) {
      * @type {Object.<number,Field>|null}
      * @private
      */
-    this._fieldsById = null;
+    this._fieldsById = {};
 
     /**
      * Cached fields as an array.
@@ -100,22 +100,6 @@ Object.defineProperties(Type.prototype, {
      */
     fieldsById: {
         get: function() {
-
-            /* istanbul ignore if */
-            if (this._fieldsById)
-                return this._fieldsById;
-
-            this._fieldsById = {};
-            for (var names = Object.keys(this.fields), i = 0; i < names.length; ++i) {
-                var field = this.fields[names[i]],
-                    id = field.id;
-
-                /* istanbul ignore if */
-                if (this._fieldsById[id])
-                    throw Error("duplicate id " + id + " in " + this);
-
-                this._fieldsById[id] = field;
-            }
             return this._fieldsById;
         }
     },
@@ -210,7 +194,7 @@ Type.generateConstructor = function generateConstructor(mtype) {
 };
 
 function clearCache(type) {
-    type._fieldsById = type._fieldsArray = type._oneofsArray = null;
+    type._fieldsArray = type._oneofsArray = null;
     delete type.encode;
     delete type.decode;
     delete type.verify;
@@ -335,8 +319,7 @@ Type.prototype.add = function add(object) {
         // The root object takes care of adding distinct sister-fields to the respective extended
         // type instead.
 
-        // avoids calling the getter if not absolutely necessary because it's called quite frequently
-        if (this._fieldsById ? /* istanbul ignore next */ this._fieldsById[object.id] : this.fieldsById[object.id])
+        if (this._fieldsById[object.id])
             throw Error("duplicate id " + object.id + " in " + this);
         if (this.isReservedId(object.id))
             throw Error("id " + object.id + " is reserved in " + this);
@@ -346,6 +329,7 @@ Type.prototype.add = function add(object) {
         if (object.parent)
             object.parent.remove(object);
         this.fields[object.name] = object;
+        this._fieldsById[object.id] = object;
         object.message = this;
         object.onAdd(this);
         return clearCache(this);
@@ -376,6 +360,7 @@ Type.prototype.remove = function remove(object) {
             throw Error(object + " is not a member of " + this);
 
         delete this.fields[object.name];
+        delete this._fieldsById[object.id];
         object.parent = null;
         object.onRemove(this);
         return clearCache(this);

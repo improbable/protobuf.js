@@ -216,29 +216,12 @@ Namespace.prototype.getEnum = function getEnum(name) {
  * @throws {Error} If there is already a nested object with this name
  */
 Namespace.prototype.add = function add(object) {
-
     if (!(object instanceof Field && object.extend !== undefined || object instanceof Type || object instanceof Enum || object instanceof Service || object instanceof Namespace))
         throw TypeError("object must be a valid nested object");
 
     if (!this.nested)
         this.nested = {};
-    else {
-        var prev = this.get(object.name);
-        if (prev) {
-            if (prev instanceof Namespace && object instanceof Namespace && !(prev instanceof Type || prev instanceof Service)) {
-                // replace plain namespace but keep existing nested elements and options
-                var nested = prev.nestedArray;
-                for (var i = 0; i < nested.length; ++i)
-                    object.add(nested[i]);
-                this.remove(prev);
-                if (!this.nested)
-                    this.nested = {};
-                object.setOptions(prev.options, true);
 
-            } else
-                throw Error("duplicate name '" + object.name + "' in " + this);
-        }
-    }
     this.nested[object.name] = object;
     object.onAdd(this);
     return clearCache(this);
@@ -314,14 +297,13 @@ Namespace.prototype.resolveAll = function resolveAll() {
  * Recursively looks up the reflection object matching the specified path in the scope of this namespace.
  * @param {string|string[]} path Path to look up
  * @param {*|Array.<*>} filterTypes Filter types, any combination of the constructors of `protobuf.Type`, `protobuf.Enum`, `protobuf.Service` etc.
- * @param {boolean} [parentAlreadyChecked=false] If known, whether the parent has already been checked
+ * @param {boolean} [canCheckParent=false] Whether the lookup can traverse up to the parent (this is expensive).
  * @returns {ReflectionObject|null} Looked up object or `null` if none could be found
  */
-Namespace.prototype.lookup = function lookup(path, filterTypes, parentAlreadyChecked) {
+Namespace.prototype.lookup = function lookup(path, filterTypes, canCheckParent) {
 
     /* istanbul ignore next */
     if (typeof filterTypes === "boolean") {
-        parentAlreadyChecked = filterTypes;
         filterTypes = undefined;
     } else if (filterTypes && !Array.isArray(filterTypes))
         filterTypes = [ filterTypes ];
@@ -343,19 +325,15 @@ Namespace.prototype.lookup = function lookup(path, filterTypes, parentAlreadyChe
         if (path.length === 1) {
             if (!filterTypes || filterTypes.indexOf(found.constructor) > -1)
                 return found;
-        } else if (found instanceof Namespace && (found = found.lookup(path.slice(1), filterTypes, true)))
+        } else if (found instanceof Namespace && (found = found.lookup(path.slice(1), filterTypes, false)))
             return found;
-
-    // Otherwise try each nested namespace
-    } else
-        for (var i = 0; i < this.nestedArray.length; ++i)
-            if (this._nestedArray[i] instanceof Namespace && (found = this._nestedArray[i].lookup(path, filterTypes, true)))
-                return found;
+    }
 
     // If there hasn't been a match, try again at the parent
-    if (this.parent === null || parentAlreadyChecked)
-        return null;
-    return this.parent.lookup(path, filterTypes);
+    if (canCheckParent) {
+        return this.parent.lookup(path, filterTypes, true);
+    }
+    return null;
 };
 
 /**
@@ -405,7 +383,7 @@ Namespace.prototype.lookupEnum = function lookupEnum(path) {
  * @throws {Error} If `path` does not point to a type or enum
  */
 Namespace.prototype.lookupTypeOrEnum = function lookupTypeOrEnum(path) {
-    var found = this.lookup(path, [ Type, Enum ]);
+    var found = this.lookup(path, [ Type, Enum ], true);
     if (!found)
         throw Error("no such Type or Enum '" + path + "' in " + this);
     return found;

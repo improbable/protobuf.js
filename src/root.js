@@ -258,7 +258,7 @@ var exposeRe = /^[A-Z]/;
  * @ignore
  */
 function tryHandleExtension(root, field) {
-    var extendedType = field.parent.lookup(field.extend);
+    var extendedType = root.lookup(field.extend);
     if (extendedType) {
         var sisterField = new Field(field.fullName, field.id, field.type, field.rule, undefined, field.options);
         sisterField.declaringField = field;

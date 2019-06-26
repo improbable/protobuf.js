@@ -1,6 +1,6 @@
 /*!
  * protobuf.js v6.8.7 (c) 2016, daniel wirtz
- * compiled fri, 18 may 2018 08:55:41 utc
+ * compiled tue, 25 jun 2019 11:22:38 utc
  * licensed under the bsd-3-clause license
  * see: https://github.com/dcodeio/protobuf.js for details
  */
@@ -2952,29 +2952,12 @@ Namespace.prototype.getEnum = function getEnum(name) {
  * @throws {Error} If there is already a nested object with this name
  */
 Namespace.prototype.add = function add(object) {
-
     if (!(object instanceof Field && object.extend !== undefined || object instanceof Type || object instanceof Enum || object instanceof Service || object instanceof Namespace))
         throw TypeError("object must be a valid nested object");
 
     if (!this.nested)
         this.nested = {};
-    else {
-        var prev = this.get(object.name);
-        if (prev) {
-            if (prev instanceof Namespace && object instanceof Namespace && !(prev instanceof Type || prev instanceof Service)) {
-                // replace plain namespace but keep existing nested elements and options
-                var nested = prev.nestedArray;
-                for (var i = 0; i < nested.length; ++i)
-                    object.add(nested[i]);
-                this.remove(prev);
-                if (!this.nested)
-                    this.nested = {};
-                object.setOptions(prev.options, true);
 
-            } else
-                throw Error("duplicate name '" + object.name + "' in " + this);
-        }
-    }
     this.nested[object.name] = object;
     object.onAdd(this);
     return clearCache(this);
@@ -3050,14 +3033,13 @@ Namespace.prototype.resolveAll = function resolveAll() {
  * Recursively looks up the reflection object matching the specified path in the scope of this namespace.
  * @param {string|string[]} path Path to look up
  * @param {*|Array.<*>} filterTypes Filter types, any combination of the constructors of `protobuf.Type`, `protobuf.Enum`, `protobuf.Service` etc.
- * @param {boolean} [parentAlreadyChecked=false] If known, whether the parent has already been checked
+ * @param {boolean} [canCheckParent=false] Whether the lookup can traverse up to the parent (this is expensive).
  * @returns {ReflectionObject|null} Looked up object or `null` if none could be found
  */
-Namespace.prototype.lookup = function lookup(path, filterTypes, parentAlreadyChecked) {
+Namespace.prototype.lookup = function lookup(path, filterTypes, canCheckParent) {
 
     /* istanbul ignore next */
     if (typeof filterTypes === "boolean") {
-        parentAlreadyChecked = filterTypes;
         filterTypes = undefined;
     } else if (filterTypes && !Array.isArray(filterTypes))
         filterTypes = [ filterTypes ];
@@ -3079,19 +3061,15 @@ Namespace.prototype.lookup = function lookup(path, filterTypes, parentAlreadyChe
         if (path.length === 1) {
             if (!filterTypes || filterTypes.indexOf(found.constructor) > -1)
                 return found;
-        } else if (found instanceof Namespace && (found = found.lookup(path.slice(1), filterTypes, true)))
+        } else if (found instanceof Namespace && (found = found.lookup(path.slice(1), filterTypes, false)))
             return found;
-
-    // Otherwise try each nested namespace
-    } else
-        for (var i = 0; i < this.nestedArray.length; ++i)
-            if (this._nestedArray[i] instanceof Namespace && (found = this._nestedArray[i].lookup(path, filterTypes, true)))
-                return found;
+    }
 
     // If there hasn't been a match, try again at the parent
-    if (this.parent === null || parentAlreadyChecked)
-        return null;
-    return this.parent.lookup(path, filterTypes);
+    if (canCheckParent) {
+        return this.parent.lookup(path, filterTypes, true);
+    }
+    return null;
 };
 
 /**
@@ -3141,7 +3119,7 @@ Namespace.prototype.lookupEnum = function lookupEnum(path) {
  * @throws {Error} If `path` does not point to a type or enum
  */
 Namespace.prototype.lookupTypeOrEnum = function lookupTypeOrEnum(path) {
-    var found = this.lookup(path, [ Type, Enum ]);
+    var found = this.lookup(path, [ Type, Enum ], true);
     if (!found)
         throw Error("no such Type or Enum '" + path + "' in " + this);
     return found;
@@ -4289,7 +4267,7 @@ var exposeRe = /^[A-Z]/;
  * @ignore
  */
 function tryHandleExtension(root, field) {
-    var extendedType = field.parent.lookup(field.extend);
+    var extendedType = root.lookup(field.extend);
     if (extendedType) {
         var sisterField = new Field(field.fullName, field.id, field.type, field.rule, undefined, field.options);
         sisterField.declaringField = field;
@@ -4821,7 +4799,7 @@ function Type(name, options) {
      * @type {Object.<number,Field>|null}
      * @private
      */
-    this._fieldsById = null;
+    this._fieldsById = {};
 
     /**
      * Cached fields as an array.
@@ -4855,22 +4833,6 @@ Object.defineProperties(Type.prototype, {
      */
     fieldsById: {
         get: function() {
-
-            /* istanbul ignore if */
-            if (this._fieldsById)
-                return this._fieldsById;
-
-            this._fieldsById = {};
-            for (var names = Object.keys(this.fields), i = 0; i < names.length; ++i) {
-                var field = this.fields[names[i]],
-                    id = field.id;
-
-                /* istanbul ignore if */
-                if (this._fieldsById[id])
-                    throw Error("duplicate id " + id + " in " + this);
-
-                this._fieldsById[id] = field;
-            }
             return this._fieldsById;
         }
     },
@@ -4965,7 +4927,7 @@ Type.generateConstructor = function generateConstructor(mtype) {
 };
 
 function clearCache(type) {
-    type._fieldsById = type._fieldsArray = type._oneofsArray = null;
+    type._fieldsArray = type._oneofsArray = null;
     delete type.encode;
     delete type.decode;
     delete type.verify;
@@ -5090,8 +5052,7 @@ Type.prototype.add = function add(object) {
         // The root object takes care of adding distinct sister-fields to the respective extended
         // type instead.
 
-        // avoids calling the getter if not absolutely necessary because it's called quite frequently
-        if (this._fieldsById ? /* istanbul ignore next */ this._fieldsById[object.id] : this.fieldsById[object.id])
+        if (this._fieldsById[object.id])
             throw Error("duplicate id " + object.id + " in " + this);
         if (this.isReservedId(object.id))
             throw Error("id " + object.id + " is reserved in " + this);
@@ -5101,6 +5062,7 @@ Type.prototype.add = function add(object) {
         if (object.parent)
             object.parent.remove(object);
         this.fields[object.name] = object;
+        this._fieldsById[object.id] = object;
         object.message = this;
         object.onAdd(this);
         return clearCache(this);
@@ -5131,6 +5093,7 @@ Type.prototype.remove = function remove(object) {
             throw Error(object + " is not a member of " + this);
 
         delete this.fields[object.name];
+        delete this._fieldsById[object.id];
         object.parent = null;
         object.onRemove(this);
         return clearCache(this);
